@@ -1,0 +1,22 @@
+{
+  "name": "Bengal Sky • বাংলাদেশ ওয়েদার",
+  "short_name": "Bengal Sky",
+  "description": "Production-ready mobile-first weather web application built exclusively for Bangladesh.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0B1420",
+  "theme_color": "#0E3B43",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
