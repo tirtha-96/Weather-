@@ -12,9 +12,14 @@ export interface CurrentWeather {
   precipitation: number;
   weatherCode: number;
   surfacePressure: number;
+  pressureTrend: "rising" | "falling" | "steady";
   windSpeed: number;
+  windGusts: number;
   windDirection: number;
   uvIndex: number;
+  dewPoint: number;
+  visibilityKm: number;
+  cloudCover: number;
   isDay: boolean;
   condition: WeatherCondition;
 }
@@ -24,9 +29,13 @@ export interface HourlyForecast {
   hourLabel: string;
   hourLabelBn: string;
   temperature: number;
+  apparentTemperature?: number;
   precipitationProb: number;
   precipitationMm: number;
   weatherCode: number;
+  windSpeed?: number;
+  humidity?: number;
+  isDay?: boolean;
 }
 
 export interface DailyForecast {
@@ -37,10 +46,12 @@ export interface DailyForecast {
   tempMax: number;
   tempMin: number;
   precipitationSum: number;
+  precipitationProbabilityMax?: number;
   weatherCode: number;
   sunrise: string;
   sunset: string;
   uvIndexMax: number;
+  windSpeedMax?: number;
   condition: WeatherCondition;
 }
 
@@ -83,6 +94,57 @@ export interface BmdAlert {
   bulletinBn: string;
   ports: string;
   issued: string;
+  validUntil?: string;
+  instructionsEn?: string;
+  instructionsBn?: string;
+}
+
+export interface LocationMeta {
+  latitude: number;
+  longitude: number;
+  accuracyMeters?: number;
+  nameEn: string;
+  nameBn: string;
+  locality?: string;
+  upazilaEn?: string;
+  upazilaBn?: string;
+  districtEn: string;
+  districtBn: string;
+  divisionEn: string;
+  divisionBn: string;
+  country: string;
+  type: "gps" | "searched" | "saved" | "fallback";
+}
+
+export interface WeatherProviderMeta {
+  name: string;
+  model: string;
+  attribution: string;
+  attributionUrl: string;
+  updatedAt: string;
+  isCache: boolean;
+}
+
+export interface WeatherInsight {
+  id: string;
+  type: "heat" | "rain" | "uv" | "wind" | "aqi" | "monsoon" | "general";
+  headlineEn: string;
+  headlineBn: string;
+  detailEn: string;
+  detailBn: string;
+  iconName: string;
+  severity: "info" | "warning" | "alert";
+}
+
+export interface AppSettings {
+  temperatureUnit: "C" | "F";
+  windSpeedUnit: "kmh" | "ms" | "mph";
+  pressureUnit: "hpa" | "inhg";
+  language: "bn" | "en";
+  useBengaliDigits: boolean;
+  theme: "dark" | "light" | "system";
+  showPrayerTimes: boolean;
+  browserNotifications: boolean;
 }
 
 export function mapWeatherCode(code: number): WeatherCondition {

@@ -5,15 +5,6 @@ import java.util.Locale
 import java.util.TimeZone
 import kotlin.math.*
 
-data class PrayerTimes(
-    val fajr: String,
-    val sunrise: String,
-    val dhuhr: String,
-    val asr: String,
-    val maghrib: String,
-    val isha: String
-)
-
 object PrayerTimesCalculator {
 
     /**

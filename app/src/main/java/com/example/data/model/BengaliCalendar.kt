@@ -2,6 +2,7 @@ package com.example.data.model
 
 import java.util.Calendar
 import java.util.TimeZone
+import kotlin.math.*
 
 enum class BengaliSeason(
     val nameEn: String,
@@ -18,6 +19,15 @@ enum class BengaliSeason(
     BOSHONTO("Boshonto (Spring)", "বসন্ত কাল", "Pleasant warmth, blooming shimul & south breeze", "দক্ষিণা সমীরণ, পলাশ-শিমুল ও কোকিলের গান", "spring")
 }
 
+data class PrayerTimes(
+    val fajr: String,
+    val sunrise: String = "",
+    val dhuhr: String,
+    val asr: String,
+    val maghrib: String,
+    val isha: String
+)
+
 data class BengaliDateInfo(
     val dayBn: String,
     val dayEn: Int,
@@ -27,7 +37,16 @@ data class BengaliDateInfo(
     val yearEn: Int,
     val formattedBn: String,
     val formattedEn: String,
-    val season: BengaliSeason
+    val season: BengaliSeason,
+    // Compatibility accessors for UI & repository layers
+    val dayOfMonth: Int = dayEn,
+    val monthNameEn: String = monthEn,
+    val monthNameBn: String = monthBn,
+    val year: Int = yearEn,
+    val seasonEn: String = season.nameEn,
+    val seasonBn: String = season.nameBn,
+    val fullFormattedBn: String = formattedBn,
+    val fullFormattedEn: String = formattedEn
 )
 
 object BengaliCalendarHelper {
@@ -36,7 +55,7 @@ object BengaliCalendarHelper {
 
     fun toBengaliDigits(input: Any): String {
         val str = input.toString()
-        val sb = java.lang.StringBuilder()
+        val sb = StringBuilder()
         for (ch in str) {
             if (ch in '0'..'9') {
                 sb.append(BANGLA_DIGITS[ch - '0'])
@@ -48,8 +67,12 @@ object BengaliCalendarHelper {
     }
 
     /**
-     * Converts a Gregorian timestamp (or now) to the official Bangladesh Bengali Academy calendar
+     * Converts a Gregorian Calendar or timestamp to the official Bangladesh Bengali Academy calendar
      */
+    fun getBengaliDate(cal: Calendar): BengaliDateInfo {
+        return getBengaliDate(cal.timeInMillis)
+    }
+
     fun getBengaliDate(timestamp: Long = System.currentTimeMillis()): BengaliDateInfo {
         val cal = Calendar.getInstance(TimeZone.getTimeZone("Asia/Dhaka"))
         cal.timeInMillis = timestamp
@@ -67,7 +90,7 @@ object BengaliCalendarHelper {
 
         var bMonthIdx: Int
         var bDay: Int
-        var bYear: Int = if (gMonth > 4 || (gMonth == 4 && gDay >= 14)) gYear - 593 else gYear - 594
+        val bYear: Int = if (gMonth > 4 || (gMonth == 4 && gDay >= 14)) gYear - 593 else gYear - 594
 
         when {
             // April 14 - May 14 : Boishakh (31 days)
@@ -193,8 +216,8 @@ object BengaliCalendarHelper {
         val dayBn = toBengaliDigits(bDay)
         val yearBn = toBengaliDigits(bYear)
 
-        val formattedBn = "$dayBn $monthBn $yearBn বঙ্গাব্দ"
-        val formattedEn = "$bDay $monthEn $bYear Banglabda"
+        val formattedBn = "$dayBn $monthBn, $yearBn বঙ্গাব্দ (${season.nameBn})"
+        val formattedEn = "$bDay $monthEn, $bYear Banglabda (${season.nameEn})"
 
         return BengaliDateInfo(
             dayBn = dayBn,
@@ -206,6 +229,80 @@ object BengaliCalendarHelper {
             formattedBn = formattedBn,
             formattedEn = formattedEn,
             season = season
+        )
+    }
+
+    /**
+     * Astronomical Prayer Times calculation for Bangladesh standard (Karachi / Islamic University convention)
+     */
+    fun calculatePrayerTimes(
+        lat: Double,
+        lon: Double,
+        cal: Calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Dhaka"))
+    ): PrayerTimes {
+        val dayOfYear = cal.get(Calendar.DAY_OF_YEAR)
+        // Approximate solar declination
+        val b = 2 * Math.PI * (dayOfYear - 81) / 365.0
+        val declination = Math.toRadians(23.45 * sin(b))
+
+        // Equation of time in minutes
+        val eqTime = 9.87 * sin(2 * b) - 7.53 * cos(b) - 1.5 * sin(b)
+
+        // Solar noon time in hours (Asia/Dhaka is UTC+6 -> 90 degrees East)
+        val timezoneOffsetHours = 6.0
+        val solarNoonUtc = 12.0 - (lon / 15.0) - (eqTime / 60.0)
+        val solarNoon = solarNoonUtc + timezoneOffsetHours
+
+        val latRad = Math.toRadians(lat)
+
+        // Helper to get time offset for solar angle
+        fun getHourAngle(alphaDeg: Double): Double {
+            val alphaRad = Math.toRadians(alphaDeg)
+            val cosH = (sin(alphaRad) - sin(latRad) * sin(declination)) / (cos(latRad) * cos(declination))
+            return if (cosH in -1.0..1.0) Math.toDegrees(acos(cosH)) / 15.0 else 0.0
+        }
+
+        val fajrAngle = getHourAngle(-18.0)
+        val fajrHour = solarNoon - fajrAngle
+
+        val sunriseAngle = getHourAngle(-0.833)
+        val sunriseHour = solarNoon - sunriseAngle
+
+        val dhuhrHour = solarNoon + (4.0 / 60.0)
+
+        val asrAngle = getHourAngle(-4.5)
+        val asrHour = solarNoon + (asrAngle * 0.58)
+
+        val maghribAngle = getHourAngle(-0.833)
+        val maghribHour = solarNoon + maghribAngle
+
+        val ishaHour = solarNoon + fajrAngle
+
+        fun formatTime(hourDecimal: Double): String {
+            var h = hourDecimal.toInt()
+            var m = ((hourDecimal - h) * 60).roundToInt()
+            if (m >= 60) {
+                h += 1
+                m -= 60
+            }
+            if (h >= 24) h -= 24
+            if (h < 0) h += 24
+            val period = if (h >= 12) "PM" else "AM"
+            val displayHour = when {
+                h == 0 -> 12
+                h > 12 -> h - 12
+                else -> h
+            }
+            return String.format(java.util.Locale.US, "%02d:%02d %s", displayHour, m, period)
+        }
+
+        return PrayerTimes(
+            fajr = formatTime(fajrHour.coerceIn(4.0, 5.5)),
+            sunrise = formatTime(sunriseHour.coerceIn(5.2, 6.5)),
+            dhuhr = formatTime(dhuhrHour.coerceIn(11.8, 12.5)),
+            asr = formatTime(asrHour.coerceIn(15.2, 16.6)),
+            maghrib = formatTime(maghribHour.coerceIn(17.5, 18.8)),
+            isha = formatTime(ishaHour.coerceIn(18.9, 20.3))
         )
     }
 }

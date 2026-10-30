@@ -36,7 +36,7 @@ fun DynamicSkyBackground(
         ConditionType.CYCLONE_STORM
     )
 
-    val (topColorTarget, midColorTarget, bottomColorTarget) = remember(timeDecimal, isMonsoon, isDarkTheme) {
+    val colors = remember(timeDecimal, isMonsoon, isDarkTheme) {
         when {
             isMonsoon -> Triple(MonsoonTeal, Color(0xFF132B32), DeepIndigo)
             timeDecimal in 5.0..6.5 -> Triple(DawnTeal, DawnRose, DawnGold)
@@ -48,6 +48,9 @@ fun DynamicSkyBackground(
             else -> Triple(NightDeep, DeepIndigo, NightStarBlue)
         }
     }
+    val topColorTarget = colors.first
+    val midColorTarget = colors.second
+    val bottomColorTarget = colors.third
 
     val topColor by animateColorAsState(topColorTarget, animationSpec = tween(1200), label = "topColor")
     val midColor by animateColorAsState(midColorTarget, animationSpec = tween(1200), label = "midColor")

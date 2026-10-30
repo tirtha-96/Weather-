@@ -28,7 +28,6 @@ import com.example.ui.theme.SignalRedLight
 fun SevereWeatherAlertBanner(
     alert: BmdAlert,
     isBengali: Boolean,
-    onEditBulletin: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var isExpanded by remember { mutableStateOf(false) }
@@ -89,24 +88,11 @@ fun SevereWeatherAlertBanner(
                     }
                 }
 
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(
-                        onClick = onEditBulletin,
-                        modifier = Modifier.size(36.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = "Edit Bulletin",
-                            tint = SignalRedLight,
-                            modifier = Modifier.size(18.dp)
-                        )
-                    }
-                    Icon(
-                        imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                        contentDescription = "Toggle Details",
-                        tint = Color.White.copy(alpha = 0.8f)
-                    )
-                }
+                Icon(
+                    imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                    contentDescription = "Toggle Details",
+                    tint = Color.White.copy(alpha = 0.8f)
+                )
             }
 
             // Summary preview

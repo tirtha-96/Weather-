@@ -111,23 +111,23 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    fun toggleLanguage(isBn: Boolean) {
+    fun toggleLanguage(isBn: Boolean = !_uiState.value.isBengali) {
         _uiState.update { it.copy(isBengali = isBn) }
     }
 
-    fun toggleFahrenheit(useF: Boolean) {
+    fun toggleFahrenheit(useF: Boolean = !_uiState.value.useFahrenheit) {
         _uiState.update { it.copy(useFahrenheit = useF) }
     }
 
-    fun toggleBengaliDigits(useDigits: Boolean) {
+    fun toggleBengaliDigits(useDigits: Boolean = !_uiState.value.useBengaliDigits) {
         _uiState.update { it.copy(useBengaliDigits = useDigits) }
     }
 
-    fun togglePrayerTimes(show: Boolean) {
+    fun togglePrayerTimes(show: Boolean = !_uiState.value.showPrayerTimes) {
         _uiState.update { it.copy(showPrayerTimes = show) }
     }
 
-    fun toggleDarkMode(isDark: Boolean) {
+    fun toggleDarkMode(isDark: Boolean = !_uiState.value.isDarkMode) {
         _uiState.update { it.copy(isDarkMode = isDark) }
     }
 }
