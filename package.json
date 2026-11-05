@@ -1,0 +1,13 @@
+{
+  "name": "bengal-sky",
+  "version": "1.0.0",
+  "description": "Bengal Sky - Bangladesh Weather App & Web Application",
+  "private": true,
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "npm --prefix web run build",
+    "start": "npm --prefix web run start -- -H 0.0.0.0",
+    "postinstall": "npm --prefix web install",
+    "install:web": "npm --prefix web install"
+  }
+}

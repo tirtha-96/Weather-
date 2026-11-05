@@ -1,0 +1,6 @@
+{
+  "name": "Bengal Sky",
+  "description": "Mobile-first weather app built exclusively for Bangladesh with administrative hierarchy, monsoon rainfall, AQI, and Bengali seasons.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

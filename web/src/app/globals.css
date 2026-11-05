@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 238, 244, 242;
+  --background-start-rgb: 14, 59, 67;
+  --background-end-rgb: 11, 20, 32;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      rgb(var(--background-start-rgb)),
+      rgb(var(--background-end-rgb))
+    )
+    fixed;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans Bengali",
+    "SolaimanLipi", sans-serif;
+  min-height: 100vh;
+}
+
+/* Custom animated weather elements */
+@keyframes sunPulse {
+  0%, 100% {
+    transform: scale(0.95);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+
+@keyframes cloudDrift {
+  0%, 100% {
+    transform: translateX(-4px);
+  }
+  50% {
+    transform: translateX(4px);
+  }
+}
+
+@keyframes rainFall {
+  0% {
+    transform: translateY(-10px);
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(24px);
+    opacity: 0.1;
+  }
+}
+
+@keyframes lightningFlash {
+  0%, 90%, 100% {
+    opacity: 0;
+  }
+  92%, 96% {
+    opacity: 1;
+  }
+  94% {
+    opacity: 0.2;
+  }
+}
+
+.anim-sun {
+  animation: sunPulse 3s ease-in-out infinite;
+}
+
+.anim-cloud {
+  animation: cloudDrift 4s ease-in-out infinite;
+}
+
+.anim-rain {
+  animation: rainFall 0.8s linear infinite;
+}
+
+.anim-lightning {
+  animation: lightningFlash 3.5s infinite;
+}
